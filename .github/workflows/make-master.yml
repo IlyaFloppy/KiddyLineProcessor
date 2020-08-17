@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+    branches: [ master ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@master
+
+    - name: Lint
+      uses: golangci/golangci-lint-action@v1
+      with:
+        version: v1.30
+
+    - name: Test
+      run: make tests
+
+    - name: Build
+      run: make build

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "./gen";
+
+message SubscriptionRequest {
+    repeated string sports = 1;
+    uint32 interval = 2;
+}
+
+message SubscriptionResponse {
+    map<string, float> deltas = 1;
+}
+
+service SportsLines {
+    rpc SubscribeOnSportsLines (stream SubscriptionRequest) returns (stream SubscriptionResponse) {
+    }
+}

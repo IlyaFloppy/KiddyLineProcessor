@@ -1,0 +1,63 @@
+version: '3'
+services:
+  app:
+    container_name: kiddy
+    build: .
+    ports:
+      - ${KLP_HTTP_PORT}:${KLP_HTTP_PORT}
+      - ${KLP_GRPC_PORT}:${KLP_GRPC_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_NAME=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+      - POSTGRES_PORT=${DB_PORT}
+      - KLP_HTTP_ADDRESS=${KLP_HTTP_ADDRESS}
+      - KLP_HTTP_PORT=${KLP_HTTP_PORT}
+      - KLP_GRPC_ADDRESS=${KLP_GRPC_ADDRESS}
+      - KLP_GRPC_PORT=${KLP_GRPC_PORT}
+      - KLP_LOG_LEVEL=${KLP_LOG_LEVEL}
+      - FETCH_SPORTS=${FETCH_SPORTS}
+      - FETCH_ADDRESS=${FETCH_ADDRESS}
+      - FETCH_PORT=${FETCH_PORT}
+      - GIN_MODE=${GIN_MODE}
+    restart: on-failure
+    #    volumes:
+    #      - api:/usr/src/app/
+    depends_on:
+      - kiddy-postgres
+      - kiddy-lines-provider
+    networks:
+      - kiddy-network
+
+
+  kiddy-postgres:
+    image: postgres:latest
+    container_name: kiddy_postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_HOST=${DB_HOST}
+    ports:
+      - 5432:5432
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+    networks:
+      - kiddy-network
+
+
+  kiddy-lines-provider:
+    image: antonboom/lines-provider
+    container_name: kiddy-lines-provider
+    networks:
+      - kiddy-network
+
+
+volumes:
+  #  api:
+  database_postgres:
+
+networks:
+  kiddy-network:
+    driver: bridge
